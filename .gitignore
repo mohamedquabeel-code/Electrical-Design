@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Ingest working output (generated datasets ARE committed; review pages are not)
+tools/pdf-ingest/out/review/
+
+.DS_Store
+.env
+.env.local
