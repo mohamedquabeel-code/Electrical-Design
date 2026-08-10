@@ -97,8 +97,14 @@ class CableRow:
     weight: float | None = None
 
     def to_json(self) -> dict[str, Any]:
+        # Emitted in camelCase so the dataset reads naturally from the
+        # TypeScript engine that consumes it, without a mapping layer.
         record = asdict(self)
-        return {key: value for key, value in record.items() if value not in (None, {}, [])}
+        return {
+            _camel(key): value
+            for key, value in record.items()
+            if value not in (None, {}, [])
+        }
 
 
 def parse_construction(text: str) -> tuple[str, str, str, str] | None:
@@ -452,6 +458,12 @@ def parse(pages: list[str], report: Report) -> list[CableRow]:
             )
 
     return rows
+
+
+def _camel(name: str) -> str:
+    """snake_case to camelCase, e.g. "r_dc_20" -> "rDc20"."""
+    head, *tail = name.split("_")
+    return head + "".join(part.title() for part in tail)
 
 
 def _trim(value: str) -> str:

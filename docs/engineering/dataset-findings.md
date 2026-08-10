@@ -61,14 +61,14 @@ Below 16 mm², skin and proximity effects are negligible, so R_AC/R_DC is
 essentially pure temperature rise and the implied conductor temperature can be
 read directly:
 
-| CSA (mm²) | Implied temperature | Column heading |
-|---|---|---|
-| 1.5 | 72.6 °C | 90 °C |
-| 2.5 | 70.1 °C | 90 °C |
-| 4 | 71.3 °C | 90 °C |
-| 6 | 70.4 °C | 90 °C |
-| 10 | 70.1 °C | 90 °C |
-| 16 | 73.1 °C (some rows reach 90 °C) | 90 °C |
+| CSA (mm²) | Implied temperature             | Column heading |
+| --------- | ------------------------------- | -------------- |
+| 1.5       | 72.6 °C                         | 90 °C          |
+| 2.5       | 70.1 °C                         | 90 °C          |
+| 4         | 71.3 °C                         | 90 °C          |
+| 6         | 70.4 °C                         | 90 °C          |
+| 10        | 70.1 °C                         | 90 °C          |
+| 16        | 73.1 °C (some rows reach 90 °C) | 90 °C          |
 
 The small XLPE rows appear to carry AC resistance computed on the PVC basis.
 
@@ -88,13 +88,13 @@ manufacturer published, and once there it is indistinguishable from real data.
 With the cell absent the engine has no rating for that cable in that condition
 and will not offer it, which fails safe.
 
-| Product | Field | Published | Page | Why it is wrong |
-|---|---|---|---|---|
-| `CP1-T101-U10` | freeAir / flatTouching | 9 A | 61 | Between 48 A at 6 mm² and 85 A at 16 mm². Dropped digit. |
-| `CXB-T101-B12` | ground / flat | 468 A | 114 | Same row's trefoil column reads 160 A; 35 mm² reads 203 A. ~2.3× too high. |
-| `CXB-T101-B15` | freeAir / flatTouching | 234 A | 114 | Between 235 A at 50 mm² and 292 A at 95 mm². |
-| `CX2-T101-B15` | freeAir / trefoilTouching | 500 A | 120 | Between 241 A at 50 mm² and 364 A at 95 mm². ~1.7× too high. |
-| `CX5-T101-B60` | duct | 720 A | 138 | Between 733 A at 500 mm² and 929 A at 800 mm². |
+| Product        | Field                     | Published | Page | Why it is wrong                                                            |
+| -------------- | ------------------------- | --------- | ---- | -------------------------------------------------------------------------- |
+| `CP1-T101-U10` | freeAir / flatTouching    | 9 A       | 61   | Between 48 A at 6 mm² and 85 A at 16 mm². Dropped digit.                   |
+| `CXB-T101-B12` | ground / flat             | 468 A     | 114  | Same row's trefoil column reads 160 A; 35 mm² reads 203 A. ~2.3× too high. |
+| `CXB-T101-B15` | freeAir / flatTouching    | 234 A     | 114  | Between 235 A at 50 mm² and 292 A at 95 mm².                               |
+| `CX2-T101-B15` | freeAir / trefoilTouching | 500 A     | 120  | Between 241 A at 50 mm² and 364 A at 95 mm². ~1.7× too high.               |
+| `CX5-T101-B60` | duct                      | 720 A     | 138  | Between 733 A at 500 mm² and 929 A at 800 mm².                             |
 
 The two marked "too high" are the dangerous direction: accepting them would let
 the engine select a badly undersized cable.
@@ -136,15 +136,15 @@ independent relation instead of trusting a successful parse.
 Run by `python3 tools/pdf-ingest/validate.py`, failing on any finding not in
 `tools/pdf-ingest/baseline.json`:
 
-| Check | Relation |
-|---|---|
-| `resistance.impliedTemperature` | R_AC/R_DC implies the temperature the column claims |
-| `voltageDrop.inconsistentWithResistance` | mV/A/m cannot fall below its own resistive term |
-| `shortCircuit.sqrtTRelation` | I(t) = I(1 s)/√t, as the catalogue states on p.16 |
-| `resistance.notMonotonic` | resistance falls as conductor size rises |
-| `ampacity.notMonotonic` | ampacity rises as conductor size rises |
-| `reactance.implausible` | derived reactance within 0.01–0.40 Ω/km |
-| `reactance.formationOrder` | flat spacing exceeds trefoil, since conductors sit further apart |
+| Check                                    | Relation                                                         |
+| ---------------------------------------- | ---------------------------------------------------------------- |
+| `resistance.impliedTemperature`          | R_AC/R_DC implies the temperature the column claims              |
+| `voltageDrop.inconsistentWithResistance` | mV/A/m cannot fall below its own resistive term                  |
+| `shortCircuit.sqrtTRelation`             | I(t) = I(1 s)/√t, as the catalogue states on p.16                |
+| `resistance.notMonotonic`                | resistance falls as conductor size rises                         |
+| `ampacity.notMonotonic`                  | ampacity rises as conductor size rises                           |
+| `reactance.implausible`                  | derived reactance within 0.01–0.40 Ω/km                          |
+| `reactance.formationOrder`               | flat spacing exceeds trefoil, since conductors sit further apart |
 
 CI additionally regenerates the datasets and asserts the committed JSON is
 byte-identical, so the data is provably derived from the PDF rather than

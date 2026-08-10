@@ -77,7 +77,7 @@ def check_resistance_ratio(products: list[dict]) -> list[Finding]:
         if product["csa"] > 16:
             continue
         alpha = TEMPERATURE_COEFFICIENT[product["conductor"]]
-        implied = 20 + (product["r_ac_max"] / product["r_dc_20"] - 1) / alpha
+        implied = 20 + (product["rAcMax"] / product["rDc20"] - 1) / alpha
         grouped[(product["insulation"], product["csa"])].append(implied)
 
     for (insulation, csa), values in sorted(grouped.items()):
@@ -118,15 +118,15 @@ def check_voltage_drop(products: list[dict], tables: dict) -> list[Finding]:
     # 0.6/1 kV unarmoured products, which are what the voltage-drop tables cover.
     resistance: dict[tuple[str, str, str, float], float] = {}
     for product in products:
-        if product["voltage_grade"] != "0.6/1" or product["armour"] != "none":
+        if product["voltageGrade"] != "0.6/1" or product["armour"] != "none":
             continue
         family = "singleCore" if product["cores"] == 1 else "multiCore"
         if family == "multiCore" and product["cores"] != 3:
             continue
-        if product.get("reduced_neutral_csa"):
+        if product.get("reducedNeutralCsa"):
             continue
         key = (family, product["conductor"], product["insulation"], product["csa"])
-        resistance.setdefault(key, product["r_ac_max"])
+        resistance.setdefault(key, product["rAcMax"])
 
     columns = {
         "pvcFlat": ("pvc", math.sqrt(3)),
@@ -208,15 +208,15 @@ def check_monotonicity(products: list[dict]) -> list[Finding]:
     findings: list[Finding] = []
     families: dict[tuple, list[dict]] = defaultdict(list)
     for product in products:
-        if product.get("reduced_neutral_csa"):
+        if product.get("reducedNeutralCsa"):
             continue
         key = (
-            product["voltage_grade"],
+            product["voltageGrade"],
             product["conductor"],
             product["insulation"],
             product["armour"],
             product["cores"],
-            product["source_page"],
+            product["sourcePage"],
         )
         families[key].append(product)
 
@@ -230,15 +230,15 @@ def check_monotonicity(products: list[dict]) -> list[Finding]:
             # required to show a strictly falling resistance.
             if current["csa"] == previous["csa"]:
                 continue
-            if current["r_dc_20"] >= previous["r_dc_20"]:
+            if current["rDc20"] >= previous["rDc20"]:
                 findings.append(
                     Finding(
                         check="resistance.notMonotonic",
                         subject=f"{label}/{previous['csa']}->{current['csa']}",
                         severity="error",
                         detail=(
-                            f"R_DC does not fall with size: {previous['r_dc_20']} then "
-                            f"{current['r_dc_20']} ohm/km."
+                            f"R_DC does not fall with size: {previous['rDc20']} then "
+                            f"{current['rDc20']} ohm/km."
                         ),
                     )
                 )
@@ -278,7 +278,7 @@ def check_reactance(products: list[dict]) -> list[Finding]:
                 findings.append(
                     Finding(
                         check="reactance.implausible",
-                        subject=f"{product['product_code']}/{formation}",
+                        subject=f"{product['productCode']}/{formation}",
                         severity="error",
                         detail=(
                             f"Derived reactance {value} ohm/km is outside "
@@ -294,7 +294,7 @@ def check_reactance(products: list[dict]) -> list[Finding]:
                 findings.append(
                     Finding(
                         check="reactance.formationOrder",
-                        subject=product["product_code"],
+                        subject=product["productCode"],
                         severity="error",
                         detail=(
                             f"Flat reactance {reactance['flat']} is not greater than trefoil "
@@ -315,7 +315,7 @@ def write_review(products: list[dict], findings: list[Finding]) -> Path:
     REVIEW_DIR.mkdir(parents=True, exist_ok=True)
     by_page: dict[int, list[dict]] = defaultdict(list)
     for product in products:
-        by_page[product["source_page"]].append(product)
+        by_page[product["sourcePage"]].append(product)
 
     flagged = {finding.subject.split("/")[0] for finding in findings}
 
@@ -354,17 +354,17 @@ def write_review(products: list[dict], findings: list[Finding]) -> Path:
             construction = (
                 f"{row['conductor'][:2].upper()}/{row['insulation'].upper()}"
                 f"{'/' + row['armour'].upper() if row['armour'] != 'none' else ''}"
-                f" {row['cores']}c {row['voltage_grade']}kV"
+                f" {row['cores']}c {row['voltageGrade']}kV"
             )
             ampacity = ", ".join(
                 f"{condition[:2]}:{'/'.join(str(int(v)) for v in formations.values())}"
                 for condition, formations in sorted(row["ampacity"].items())
             )
-            css = " class='flagged'" if row["product_code"] in flagged else ""
+            css = " class='flagged'" if row["productCode"] in flagged else ""
             parts.append(
-                f"<tr{css}><td>{row['product_code']}</td><td>{construction}</td>"
-                f"<td>{row['csa']}</td><td>{row['r_dc_20']}</td><td>{row['r_ac_max']}</td>"
-                f"<td>{ampacity}</td><td>{row.get('overall_diameter', '')}</td>"
+                f"<tr{css}><td>{row['productCode']}</td><td>{construction}</td>"
+                f"<td>{row['csa']}</td><td>{row['rDc20']}</td><td>{row['rAcMax']}</td>"
+                f"<td>{ampacity}</td><td>{row.get('overallDiameter', '')}</td>"
                 f"<td>{row.get('weight', '')}</td></tr>"
             )
         parts.append("</table>")

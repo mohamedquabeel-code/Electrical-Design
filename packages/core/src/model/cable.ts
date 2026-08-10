@@ -101,6 +101,50 @@ export const Formation = z.enum(["trefoil", "flat"]);
 export type Formation = z.infer<typeof Formation>;
 
 /**
+ * How a published impedance is qualified.
+ *
+ * Single-core cables have a reactance per formation, because the engineer sets
+ * the spacing. Multicore cables have one figure — the cores are fixed by the
+ * cable's construction and cannot be rearranged on site.
+ */
+export const ImpedanceArrangement = z.enum(["default", "trefoil", "flat"]);
+export type ImpedanceArrangement = z.infer<typeof ImpedanceArrangement>;
+
+/**
+ * How a published ampacity is qualified within an installation condition.
+ *
+ * Ratings are kept per arrangement rather than collapsed to one figure per
+ * condition. The difference is real and the arrangement is the engineer's
+ * choice — 0.6/1 kV 240 mm2 single-core copper is rated 622 A flat-touching
+ * against 602 A trefoil-touching in free air, and spacing the same cables apart
+ * raises it further still.
+ */
+export const AmpacityArrangement = z.enum([
+  /** The condition publishes a single figure, with no arrangement variants. */
+  "default",
+  "flat",
+  "trefoil",
+  "flatSpaced",
+  "flatTouching",
+  "trefoilTouching",
+]);
+export type AmpacityArrangement = z.infer<typeof AmpacityArrangement>;
+
+/**
+ * Published ratings by installation condition and arrangement, in amperes.
+ *
+ * Entries are absent rather than zero when a rating is not published, or when
+ * ingest quarantined a defective published value. A missing rating must never
+ * be read as zero or substituted from a neighbouring condition — the engine
+ * treats it as "this cable cannot be selected here", which fails safe.
+ */
+export const AmpacitySet = z.record(
+  z.enum(["ground", "duct", "freeAir", "conduit"]),
+  z.record(AmpacityArrangement, z.number().positive()),
+);
+export type AmpacitySet = z.infer<typeof AmpacitySet>;
+
+/**
  * A single cable product row as published in a catalogue.
  *
  * `ampacity` is keyed by installation condition; a product may not publish a
@@ -121,19 +165,35 @@ export const CableProduct = z.object({
   cores: z.number().int().positive(),
   /** Conductor DC resistance at 20 degC, ohm/km. */
   rDc20: z.number().positive(),
-  /** Conductor AC resistance at maximum operating temperature, ohm/km. */
+  /**
+   * Published conductor AC resistance at the catalogue's stated maximum
+   * operating temperature, ohm/km.
+   *
+   * Treat as indicative rather than authoritative: for XLPE below 16 mm2 the
+   * catalogue's values imply roughly 70 degC despite a 90 degC column heading
+   * (see docs/engineering/dataset-findings.md). The engine recomputes
+   * resistance at the actual operating temperature from `rDc20` instead.
+   */
   rAcMax: z.number().positive(),
   /**
-   * Reactance at 50 Hz, ohm/km. Not published per-row in the catalogue; it is
-   * derived during ingest (see tools/pdf-ingest) and carries its own provenance.
+   * Reactance at 50 Hz by arrangement, ohm/km.
+   *
+   * Present on MV products, where the catalogue publishes inductance directly
+   * and reactance is X = 2*pi*f*L. Absent on LV products, where it is derived
+   * by the standard profile.
+   *
+   * Single-core products publish trefoil and flat separately; multicore
+   * products publish one figure, since the cores are fixed in place by the
+   * cable's own construction and the engineer cannot alter their spacing.
    */
-  x: z.number().nonnegative().optional(),
-  /** Current rating by installation condition, amperes. */
-  ampacity: z.object({
-    ground: z.number().positive().optional(),
-    duct: z.number().positive().optional(),
-    freeAir: z.number().positive().optional(),
-  }),
+  reactance: z.record(ImpedanceArrangement, z.number().nonnegative()).optional(),
+  /** Published inductance by arrangement, mH/km. MV products only. */
+  inductance: z.record(z.string(), z.number().nonnegative()).optional(),
+  /** Published capacitance, microfarads/km. MV products only. */
+  capacitance: z.number().positive().optional(),
+  ampacity: AmpacitySet,
+  /** Reduced neutral size for 4-core cables that carry one, mm2. */
+  reducedNeutralCsa: z.number().positive().optional(),
   /** Approximate overall diameter, mm. Used for conduit and tray fill. */
   overallDiameter: z.number().positive().optional(),
   /** Approximate mass, kg/km. Used for tray loading and BOM. */
@@ -142,6 +202,16 @@ export const CableProduct = z.object({
   sourcePage: z.number().int().positive(),
 });
 export type CableProduct = z.infer<typeof CableProduct>;
+
+/**
+ * Conductor resistance corrected to an operating temperature, ohm/km.
+ * `R_theta = R20 [1 + alpha(theta - 20)]` — catalogue p.15.
+ */
+export const resistanceAtTemperature = (
+  rDc20: number,
+  conductor: ConductorMaterial,
+  temperature: number,
+): number => rDc20 * (1 + TEMPERATURE_COEFFICIENT[conductor] * (temperature - 20));
 
 /**
  * Maximum continuous conductor operating temperature by insulation, degC.
