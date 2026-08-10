@@ -1,0 +1,56 @@
+{
+  "$comment": [
+    "Reviewed corrections to defects in the source catalogue.",
+    "",
+    "Each entry removes a single published value that has been checked against",
+    "the PDF and found to be wrong. Values are QUARANTINED, never replaced: a",
+    "plausible substitute would be this pipeline inventing manufacturer data,",
+    "and an invented ampacity is indistinguishable from a real one once it is",
+    "in the dataset. With the cell absent the engine simply has no rating for",
+    "that cable in that condition and will not select it, which fails safe.",
+    "",
+    "Every entry is echoed into provenance.json so the calculation report can",
+    "state which published values were rejected and why.",
+    "",
+    "To resolve one, obtain the correct figure from the manufacturer and add it",
+    "as a 'replace' entry citing the source of the confirmed value."
+  ],
+  "quarantine": [
+    {
+      "productCode": "CP1-T101-U10",
+      "field": "ampacity.freeAir.flatTouching",
+      "published": 9,
+      "page": 61,
+      "reason": "Reads 9 A for 10 mm2 between 48 A at 6 mm2 and 85 A at 16 mm2. A dropped digit; the value is roughly an order of magnitude low."
+    },
+    {
+      "productCode": "CXB-T101-B12",
+      "field": "ampacity.ground.flat",
+      "published": 468,
+      "page": 114,
+      "reason": "Reads 468 A for 25 mm2 where the same row's trefoil column reads 160 A and 35 mm2 reads 203 A. Roughly 2.3x too high, so accepting it would undersize a cable."
+    },
+    {
+      "productCode": "CXB-T101-B15",
+      "field": "ampacity.freeAir.flatTouching",
+      "published": 234,
+      "page": 114,
+      "reason": "Reads 234 A for 70 mm2 between 235 A at 50 mm2 and 292 A at 95 mm2, so the rating does not rise with conductor size."
+    },
+    {
+      "productCode": "CX2-T101-B15",
+      "field": "ampacity.freeAir.trefoilTouching",
+      "published": 500,
+      "page": 120,
+      "reason": "Reads 500 A for 70 mm2 between 241 A at 50 mm2 and 364 A at 95 mm2. Roughly 1.7x too high, so accepting it would undersize a cable."
+    },
+    {
+      "productCode": "CX5-T101-B60",
+      "field": "ampacity.duct.default",
+      "published": 720,
+      "page": 138,
+      "reason": "Reads 720 A for 630 mm2 between 733 A at 500 mm2 and 929 A at 800 mm2, so the rating does not rise with conductor size."
+    }
+  ],
+  "replace": []
+}

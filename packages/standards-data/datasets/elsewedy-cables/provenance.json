@@ -1,0 +1,122 @@
+{
+  "coverage": {
+    "cablePages": [
+      59,
+      141
+    ],
+    "excluded": {
+      "pages": [
+        144,
+        167
+      ],
+      "reason": "26/45 kV and above are outside the tool's declared LV + MV (to 36 kV) scope and use a different table layout, with ratings in a separate block from construction data."
+    },
+    "generalTablePages": [
+      17,
+      25
+    ]
+  },
+  "datasetId": "elsewedy-cables",
+  "quarantinedValues": [
+    {
+      "field": "ampacity.freeAir.flatTouching",
+      "page": 61,
+      "productCode": "CP1-T101-U10",
+      "published": 9,
+      "reason": "Reads 9 A for 10 mm2 between 48 A at 6 mm2 and 85 A at 16 mm2. A dropped digit; the value is roughly an order of magnitude low."
+    },
+    {
+      "field": "ampacity.ground.flat",
+      "page": 114,
+      "productCode": "CXB-T101-B12",
+      "published": 468,
+      "reason": "Reads 468 A for 25 mm2 where the same row's trefoil column reads 160 A and 35 mm2 reads 203 A. Roughly 2.3x too high, so accepting it would undersize a cable."
+    },
+    {
+      "field": "ampacity.freeAir.flatTouching",
+      "page": 114,
+      "productCode": "CXB-T101-B15",
+      "published": 234,
+      "reason": "Reads 234 A for 70 mm2 between 235 A at 50 mm2 and 292 A at 95 mm2, so the rating does not rise with conductor size."
+    },
+    {
+      "field": "ampacity.freeAir.trefoilTouching",
+      "page": 120,
+      "productCode": "CX2-T101-B15",
+      "published": 500,
+      "reason": "Reads 500 A for 70 mm2 between 241 A at 50 mm2 and 364 A at 95 mm2. Roughly 1.7x too high, so accepting it would undersize a cable."
+    },
+    {
+      "field": "ampacity.duct.default",
+      "page": 138,
+      "productCode": "CX5-T101-B60",
+      "published": 720,
+      "reason": "Reads 720 A for 630 mm2 between 733 A at 500 mm2 and 929 A at 800 mm2, so the rating does not rise with conductor size."
+    }
+  ],
+  "referenceConditions": {
+    "ambientAirTempC": 30,
+    "ampacityBasis": "IEC 60287",
+    "burialDepthM": 0.5,
+    "ductInnerDiameterRatio": 1.5,
+    "frequencyHz": 50,
+    "groundTempC": 20,
+    "loadFactor": 1.0,
+    "soilThermalResistivityKmPerW": 1.0,
+    "sourcePage": 16
+  },
+  "source": {
+    "document": "Elsewedy Electric Power Cables Catalogue",
+    "file": "power-cables-catalogue.pdf",
+    "pageCount": 167,
+    "sha256": "b4317601a700d43e188e87e53ad09f03df7a7fd006afb48c16102b274c6b2bf5"
+  },
+  "tables": {
+    "burialDepth": {
+      "caption": "Table 5 — Burial depth",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 18
+    },
+    "groupingInGround": {
+      "caption": "Tables 8 & 9 — Grouping laid direct in ground",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 18
+    },
+    "metals": {
+      "caption": "Table 1 — Electrical properties of metals",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 17
+    },
+    "pvcRatedTemperature": {
+      "caption": "Table 7 — PVC rated temperature",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 18
+    },
+    "shortCircuit": {
+      "caption": "Tables 14-17 — Short-circuit current",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 22
+    },
+    "shortCircuitTemperatures": {
+      "caption": "Table 13 — Max short-circuit temperatures",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 21
+    },
+    "soilResistivity": {
+      "caption": "Table 6 — Soil thermal resistivity",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 18
+    },
+    "temperatureDerating": {
+      "caption": "Tables 3 & 4 — Air and ground temperature",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 17
+    },
+    "voltageDrop": {
+      "caption": "Tables 18-19 — Voltage drop mV/A/m",
+      "document": "Elsewedy Electric Power Cables Catalogue",
+      "page": 24
+    }
+  },
+  "version": "1.0.0"
+}
