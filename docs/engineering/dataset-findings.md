@@ -113,7 +113,7 @@ in a block separate from the construction data. They are recorded as excluded in
 
 ---
 
-## 6. A parser bug this validation caught
+## 6. Three parser bugs this validation caught
 
 Page 60 (flexible copper conductors) carries an extra **"Maximum Diameter of
 Wires"** column between the conductor size and the resistances. Its rows
@@ -126,8 +126,31 @@ The parse was clean and the JSON well-formed; nothing about the output looked
 wrong. It surfaced only because the implied-temperature check found an
 R_AC/R_DC ratio of 51 where physics allows about 1.2.
 
+**Table 6 (soil thermal resistivity) captured the wrong row.** The page carries
+the phrase "de-rating factors" twice — once as the table's caption and once as
+the data row's label — so anchoring on the caption picked up the axis row
+instead. Every value equalled its own key: `{0.8: 0.8, 1.5: 1.5, …}`. It passed
+the unity-at-reference check by coincidence, because 1.0 maps to 1.0. A cable
+buried in 1.5 K·m/W soil was being _uprated_ by 1.5 instead of derated to 0.83 —
+a factor of 1.8 in the wrong direction. Caught by an end-to-end sizing test
+returning a total correction factor of 1.38 where anything above 1.0 is
+impossible for that route.
+
+**Tables 8 and 9 (grouping) mixed in rows from Table 10.** Page 19 prints the
+captions for Tables 9 and 10 together with Table 10's data first, and Table 10
+is keyed by tray count — so its rows also begin with 2 and 3 and carry the same
+field count. Anchoring on the caption silently interleaved the two tables,
+giving a "3 circuits, touching, trefoil" factor of **1.00** — no derating at all
+— where the real figure is **0.69**. Three bunched circuits would have been
+sized as though they were isolated.
+
+Both are now anchored on the data's own column header, and both assert their
+physical properties: soil factors must fall as resistivity rises, and grouping
+factors must fall as circuits are added and rise as spacing increases.
+
 This is the reason the pipeline recomputes every derived quantity from an
-independent relation instead of trusting a successful parse.
+independent relation instead of trusting a successful parse — and the reason
+the engine is exercised against the real dataset, not only against fixtures.
 
 ---
 

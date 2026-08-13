@@ -121,13 +121,47 @@ def parse_burial_depth(pages: list[str]) -> dict[str, Any]:
 
 
 def parse_soil_resistivity(pages: list[str]) -> dict[str, float]:
-    """Table 6 — soil thermal resistivity correction."""
+    """Table 6 — soil thermal resistivity correction.
+
+    Anchored on the axis row rather than on the caption. The page carries the
+    phrase "de-rating factors" twice — once as the table's own caption and once
+    as the data row's label — and anchoring on the caption picks up the axis
+    row instead, producing a table whose every value equals its own key. That
+    passes a unity-at-reference check by coincidence (1.0 maps to 1.0) while
+    making every other factor badly wrong, so the axis is located first and the
+    factors are taken as the row after it.
+    """
     text = pages[PAGE_DERATING_DEPTH - 1]
     axis = [0.8, 0.9, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0]
-    factors = _row_after(text, "de-rating factors", len(axis))
+
+    lines = text.split("\n")
+    start = next(
+        (i for i, line in enumerate(lines) if "soil thermal resistivity" in line.lower()),
+        None,
+    )
+    if start is None:
+        raise KeyError("soil thermal resistivity axis row not found")
+
+    rows = [numbers(line) for line in lines[start:]]
+    matching = [row for row in rows if len(row) == len(axis)]
+    if len(matching) < 2:
+        raise ValueError("soil resistivity table: axis and factor rows not both found")
+
+    parsed_axis, factors = matching[0], matching[1]
+    if parsed_axis != axis:
+        raise ValueError(f"soil resistivity axis is {parsed_axis}, expected {axis}")
+
     table = {str(k): v for k, v in zip(axis, factors)}
+
+    # Drier soil conducts heat away less well, so the factor must fall as
+    # resistivity rises, and must be unity at the 1.0 K.m/W reference.
     if table["1.0"] != 1.0:
         raise ValueError("soil resistivity table is not unity at the 1.0 K.m/W reference")
+    if factors != sorted(factors, reverse=True):
+        raise ValueError(f"soil resistivity factors are not decreasing: {factors}")
+    if factors[0] <= 1.0:
+        raise ValueError("soil resistivity factor below the reference should exceed 1")
+
     return table
 
 
@@ -142,13 +176,26 @@ def parse_pvc_rated_temperature(pages: list[str]) -> dict[str, dict[str, float]]
     }
 
 
-def _grouping_in_ground(text: str, anchor: str) -> dict[str, Any]:
+GROUPING_HEADER = re.compile(r"^\s*nr\b.*trefoil", re.IGNORECASE)
+
+
+def _grouping_in_ground(text: str, _anchor: str) -> dict[str, Any]:
     """Tables 8 and 9 — grouping of circuits laid direct in ground.
 
     Six factors per row: {touching, 0.15 m, 0.30 m} x {trefoil, flat}.
+
+    Anchored on the "nr Trefoil Flat ..." column header immediately above the
+    data, not on the table caption. Page 19 carries the captions for Tables 9
+    and 10 together, with Table 10's data printed first, and Table 10's rows
+    are keyed by tray count — so they also begin with 2 and 3 and have the same
+    field count. Anchoring on the caption silently mixed the two tables,
+    yielding a "3 circuits touching trefoil" factor of 1.00 (no derating at all)
+    where the real figure is 0.69.
     """
     lines = text.split("\n")
-    start = next(i for i, line in enumerate(lines) if anchor.lower() in line.lower())
+    start = next((i for i, line in enumerate(lines) if GROUPING_HEADER.match(line)), None)
+    if start is None:
+        raise KeyError("grouping table column header not found")
     spacings = ["touching", "0.15", "0.30"]
     formations = ["trefoil", "flat"]
     result: dict[str, Any] = {}
@@ -169,7 +216,22 @@ def _grouping_in_ground(text: str, anchor: str) -> dict[str, Any]:
         result[str(int(circuits))] = entry
         found.append(int(circuits))
     if found != expected:
-        raise ValueError(f"{anchor}: matched circuit counts {found}, expected {expected}")
+        raise ValueError(f"grouping table: matched circuit counts {found}, expected {expected}")
+
+    # Two physical properties the table must satisfy. Both were violated by the
+    # caption-anchored version, so they are asserted rather than assumed:
+    # more circuits crowded together means less cooling, and more spacing
+    # between them means more.
+    for formation in ("trefoil", "flat"):
+        crowding = [result[str(n)]["touching"][formation] for n in expected]
+        if crowding != sorted(crowding, reverse=True):
+            raise ValueError(f"grouping factors do not fall as circuits are added: {crowding}")
+        for count in expected:
+            entry = result[str(count)]
+            spread = [entry[s][formation] for s in spacings]
+            if spread != sorted(spread):
+                raise ValueError(f"grouping factors do not rise with spacing: {spread}")
+
     return result
 
 

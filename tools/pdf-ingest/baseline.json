@@ -18,6 +18,16 @@
       "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 70 degC."
     },
     {
+      "key": "resistance.impliedTemperature::xlpe/10.0",
+      "group": "xlpeSmallSizeResistanceBasis",
+      "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 70 degC."
+    },
+    {
+      "key": "resistance.impliedTemperature::xlpe/16.0",
+      "group": "xlpeSmallSizeResistanceBasis",
+      "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 73 degC."
+    },
+    {
       "key": "resistance.impliedTemperature::xlpe/2.5",
       "group": "xlpeSmallSizeResistanceBasis",
       "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 70 degC."
@@ -32,38 +42,6 @@
       "group": "xlpeSmallSizeResistanceBasis",
       "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 70 degC."
     },
-    {
-      "key": "resistance.impliedTemperature::xlpe/10.0",
-      "group": "xlpeSmallSizeResistanceBasis",
-      "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 70 degC."
-    },
-    {
-      "key": "resistance.impliedTemperature::xlpe/16.0",
-      "group": "xlpeSmallSizeResistanceBasis",
-      "note": "Column headed 'AC at 90 degC' but R_AC/R_DC implies about 73 degC."
-    },
-
-    {
-      "key": "voltageDrop.inconsistentWithResistance::singleCore/copper/xlpeFlat/4",
-      "group": "voltageDropTables",
-      "note": "Follows from the XLPE small-size resistance basis above."
-    },
-    {
-      "key": "voltageDrop.inconsistentWithResistance::singleCore/copper/xlpeFlat/6",
-      "group": "voltageDropTables",
-      "note": "Follows from the XLPE small-size resistance basis above."
-    },
-    {
-      "key": "voltageDrop.inconsistentWithResistance::singleCore/copper/xlpeTrefoil/4",
-      "group": "voltageDropTables",
-      "note": "Follows from the XLPE small-size resistance basis above."
-    },
-    {
-      "key": "voltageDrop.inconsistentWithResistance::singleCore/copper/xlpeTrefoil/6",
-      "group": "voltageDropTables",
-      "note": "Follows from the XLPE small-size resistance basis above."
-    },
-
     {
       "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/pvc/16",
       "group": "table19MultiCore",
@@ -90,14 +68,24 @@
       "note": "Table 19 value falls below its own resistive term."
     },
     {
-      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/2.5",
-      "group": "table19MultiCore",
-      "note": "Table 19 value inconsistent with the published resistance."
+      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/1.5",
+      "group": "table19XlpeColumn",
+      "note": "Table 19's XLPE column is a near-copy of its PVC column (ratio 0.998-1.006) rather than a recomputation at 90 degC, where 1.0657 is required."
+    },
+    {
+      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/10",
+      "group": "table19XlpeColumn",
+      "note": "Table 19's XLPE column is a near-copy of its PVC column (ratio 0.998-1.006) rather than a recomputation at 90 degC, where 1.0657 is required."
     },
     {
       "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/16",
       "group": "table19MultiCore",
       "note": "Table 19 value falls below its own resistive term."
+    },
+    {
+      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/2.5",
+      "group": "table19MultiCore",
+      "note": "Table 19 value inconsistent with the published resistance."
     },
     {
       "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/25",
@@ -110,9 +98,19 @@
       "note": "Table 19 value falls below its own resistive term."
     },
     {
+      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/4",
+      "group": "table19XlpeColumn",
+      "note": "Table 19's XLPE column is a near-copy of its PVC column (ratio 0.998-1.006) rather than a recomputation at 90 degC, where 1.0657 is required."
+    },
+    {
       "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/50",
       "group": "table19MultiCore",
       "note": "Table 19 value falls below its own resistive term."
+    },
+    {
+      "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/6",
+      "group": "table19XlpeColumn",
+      "note": "Table 19's XLPE column is a near-copy of its PVC column (ratio 0.998-1.006) rather than a recomputation at 90 degC, where 1.0657 is required."
     },
     {
       "key": "voltageDrop.inconsistentWithResistance::multiCore/copper/xlpe/70",

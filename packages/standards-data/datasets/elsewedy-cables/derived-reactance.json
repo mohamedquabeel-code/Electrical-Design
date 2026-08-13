@@ -1,0 +1,451 @@
+{
+  "datasetId": "elsewedy-cables",
+  "reactance": {
+    "method": {
+      "conditioning": "Derivation restricted to sizes where the reactive term is at least 3% of the tabulated voltage drop. Below that, published rounding dominates the back-solved value.",
+      "formula": "X = (Vd/sqrt(3) - 0.8 R) / 0.6",
+      "frequencyHz": 50,
+      "multiCore": "Taken from single-core trefoil as a conservative upper bound. Table 19 is not used: its values fall below their own resistive term from 16 mm2 upward, and its XLPE column is a near-copy of its PVC column rather than a recomputation at 90 degC.",
+      "powerFactor": 0.8,
+      "resistanceBasis": "R recomputed from R_DC at 20 degC at the compound's rated temperature (70 degC PVC, 90 degC XLPE), not read from the published R_AC column, which is on a 70 degC basis for XLPE below 16 mm2 despite its 90 degC heading.",
+      "source": "Table 18 (single core) and Table 19 (multicore, to 10 mm2)"
+    },
+    "multiCore": {
+      "aluminium": {
+        "pvc": {
+          "120": {
+            "default": 0.0845
+          },
+          "150": {
+            "default": 0.0838
+          },
+          "16": {
+            "default": 0.0992
+          },
+          "185": {
+            "default": 0.0837
+          },
+          "240": {
+            "default": 0.0817
+          },
+          "25": {
+            "default": 0.0983
+          },
+          "300": {
+            "default": 0.0823
+          },
+          "35": {
+            "default": 0.0933
+          },
+          "400": {
+            "default": 0.0813
+          },
+          "50": {
+            "default": 0.0913
+          },
+          "500": {
+            "default": 0.0811
+          },
+          "630": {
+            "default": 0.0808
+          },
+          "70": {
+            "default": 0.089
+          },
+          "95": {
+            "default": 0.0868
+          }
+        },
+        "xlpe": {
+          "120": {
+            "default": 0.0813
+          },
+          "150": {
+            "default": 0.0818
+          },
+          "16": {
+            "default": 0.1028
+          },
+          "185": {
+            "default": 0.0824
+          },
+          "240": {
+            "default": 0.0817
+          },
+          "25": {
+            "default": 0.0993
+          },
+          "300": {
+            "default": 0.0812
+          },
+          "35": {
+            "default": 0.0943
+          },
+          "400": {
+            "default": 0.0768
+          },
+          "50": {
+            "default": 0.0878
+          },
+          "500": {
+            "default": 0.0881
+          },
+          "630": {
+            "default": 0.0767
+          },
+          "70": {
+            "default": 0.0866
+          },
+          "95": {
+            "default": 0.0832
+          }
+        }
+      },
+      "copper": {
+        "pvc": {
+          "120": {
+            "default": 0.0917
+          },
+          "150": {
+            "default": 0.0851
+          },
+          "16": {
+            "default": 0.0976
+          },
+          "185": {
+            "default": 0.0844
+          },
+          "240": {
+            "default": 0.0827
+          },
+          "25": {
+            "default": 0.0882
+          },
+          "300": {
+            "default": 0.0841
+          },
+          "35": {
+            "default": 0.0984
+          },
+          "400": {
+            "default": 0.0828
+          },
+          "50": {
+            "default": 0.087
+          },
+          "500": {
+            "default": 0.084
+          },
+          "630": {
+            "default": 0.0838
+          },
+          "70": {
+            "default": 0.0863
+          },
+          "95": {
+            "default": 0.0847
+          }
+        },
+        "xlpe": {
+          "10": {
+            "default": 0.1036
+          },
+          "120": {
+            "default": 0.0834
+          },
+          "150": {
+            "default": 0.0827
+          },
+          "16": {
+            "default": 0.106
+          },
+          "185": {
+            "default": 0.0836
+          },
+          "240": {
+            "default": 0.0816
+          },
+          "25": {
+            "default": 0.0919
+          },
+          "300": {
+            "default": 0.0826
+          },
+          "35": {
+            "default": 0.0945
+          },
+          "400": {
+            "default": 0.0731
+          },
+          "50": {
+            "default": 0.0888
+          },
+          "500": {
+            "default": 0.0821
+          },
+          "630": {
+            "default": 0.0779
+          },
+          "70": {
+            "default": 0.0871
+          },
+          "95": {
+            "default": 0.0856
+          }
+        }
+      }
+    },
+    "singleCore": {
+      "aluminium": {
+        "pvc": {
+          "120": {
+            "flat": 0.1422,
+            "trefoil": 0.0845
+          },
+          "150": {
+            "flat": 0.1415,
+            "trefoil": 0.0838
+          },
+          "16": {
+            "flat": 0.157,
+            "trefoil": 0.0992
+          },
+          "185": {
+            "flat": 0.1414,
+            "trefoil": 0.0837
+          },
+          "240": {
+            "flat": 0.1394,
+            "trefoil": 0.0817
+          },
+          "25": {
+            "flat": 0.157,
+            "trefoil": 0.0983
+          },
+          "300": {
+            "flat": 0.14,
+            "trefoil": 0.0823
+          },
+          "35": {
+            "flat": 0.151,
+            "trefoil": 0.0933
+          },
+          "400": {
+            "flat": 0.139,
+            "trefoil": 0.0813
+          },
+          "50": {
+            "flat": 0.149,
+            "trefoil": 0.0913
+          },
+          "500": {
+            "flat": 0.1388,
+            "trefoil": 0.0811
+          },
+          "630": {
+            "flat": 0.1385,
+            "trefoil": 0.0808
+          },
+          "70": {
+            "flat": 0.1467,
+            "trefoil": 0.089
+          },
+          "95": {
+            "flat": 0.1475,
+            "trefoil": 0.0868
+          }
+        },
+        "xlpe": {
+          "120": {
+            "flat": 0.1391,
+            "trefoil": 0.0813
+          },
+          "150": {
+            "flat": 0.1396,
+            "trefoil": 0.0818
+          },
+          "16": {
+            "flat": 0.1615,
+            "trefoil": 0.1028
+          },
+          "185": {
+            "flat": 0.1402,
+            "trefoil": 0.0824
+          },
+          "240": {
+            "flat": 0.1395,
+            "trefoil": 0.0817
+          },
+          "25": {
+            "flat": 0.158,
+            "trefoil": 0.0993
+          },
+          "300": {
+            "flat": 0.1389,
+            "trefoil": 0.0812
+          },
+          "35": {
+            "flat": 0.152,
+            "trefoil": 0.0943
+          },
+          "400": {
+            "flat": 0.1345,
+            "trefoil": 0.0768
+          },
+          "50": {
+            "flat": 0.1465,
+            "trefoil": 0.0878
+          },
+          "500": {
+            "flat": 0.1468,
+            "trefoil": 0.0881
+          },
+          "630": {
+            "flat": 0.1344,
+            "trefoil": 0.0767
+          },
+          "70": {
+            "flat": 0.1443,
+            "trefoil": 0.0866
+          },
+          "95": {
+            "flat": 0.1448,
+            "trefoil": 0.0832
+          }
+        }
+      },
+      "copper": {
+        "pvc": {
+          "10": {
+            "flat": 0.1443
+          },
+          "120": {
+            "flat": 0.1504,
+            "trefoil": 0.0917
+          },
+          "150": {
+            "flat": 0.1428,
+            "trefoil": 0.0851
+          },
+          "16": {
+            "flat": 0.1553,
+            "trefoil": 0.0976
+          },
+          "185": {
+            "flat": 0.1421,
+            "trefoil": 0.0844
+          },
+          "240": {
+            "flat": 0.1414,
+            "trefoil": 0.0827
+          },
+          "25": {
+            "flat": 0.146,
+            "trefoil": 0.0882
+          },
+          "300": {
+            "flat": 0.1418,
+            "trefoil": 0.0841
+          },
+          "35": {
+            "flat": 0.159,
+            "trefoil": 0.0984
+          },
+          "400": {
+            "flat": 0.1406,
+            "trefoil": 0.0828
+          },
+          "50": {
+            "flat": 0.1457,
+            "trefoil": 0.087
+          },
+          "500": {
+            "flat": 0.1418,
+            "trefoil": 0.084
+          },
+          "6": {
+            "flat": 0.1738
+          },
+          "630": {
+            "flat": 0.1415,
+            "trefoil": 0.0838
+          },
+          "70": {
+            "flat": 0.145,
+            "trefoil": 0.0863
+          },
+          "95": {
+            "flat": 0.1434,
+            "trefoil": 0.0847
+          }
+        },
+        "xlpe": {
+          "10": {
+            "flat": 0.1614,
+            "trefoil": 0.1036
+          },
+          "120": {
+            "flat": 0.1411,
+            "trefoil": 0.0834
+          },
+          "150": {
+            "flat": 0.1414,
+            "trefoil": 0.0827
+          },
+          "16": {
+            "flat": 0.1647,
+            "trefoil": 0.106
+          },
+          "185": {
+            "flat": 0.1414,
+            "trefoil": 0.0836
+          },
+          "240": {
+            "flat": 0.1393,
+            "trefoil": 0.0816
+          },
+          "25": {
+            "flat": 0.1496,
+            "trefoil": 0.0919
+          },
+          "300": {
+            "flat": 0.1413,
+            "trefoil": 0.0826
+          },
+          "35": {
+            "flat": 0.1532,
+            "trefoil": 0.0945
+          },
+          "400": {
+            "flat": 0.1318,
+            "trefoil": 0.0731
+          },
+          "50": {
+            "flat": 0.1465,
+            "trefoil": 0.0888
+          },
+          "500": {
+            "flat": 0.1408,
+            "trefoil": 0.0821
+          },
+          "6": {
+            "flat": 0.1791
+          },
+          "630": {
+            "flat": 0.1357,
+            "trefoil": 0.0779
+          },
+          "70": {
+            "flat": 0.1448,
+            "trefoil": 0.0871
+          },
+          "95": {
+            "flat": 0.1434,
+            "trefoil": 0.0856
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0.0"
+}

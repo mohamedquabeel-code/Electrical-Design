@@ -83,30 +83,30 @@
       "multiCore": {
         "2": {
           "0.15": {
-            "flat": 0.77,
-            "trefoil": 0.8
+            "flat": 0.87,
+            "trefoil": 0.87
           },
           "0.30": {
-            "flat": 0.68,
-            "trefoil": 0.73
+            "flat": 0.91,
+            "trefoil": 0.91
           },
           "touching": {
-            "flat": 0.87,
-            "trefoil": 1.0
+            "flat": 0.81,
+            "trefoil": 0.81
           }
         },
         "3": {
           "0.15": {
-            "flat": 0.76,
-            "trefoil": 0.79
+            "flat": 0.78,
+            "trefoil": 0.76
           },
           "0.30": {
-            "flat": 0.66,
-            "trefoil": 0.71
+            "flat": 0.84,
+            "trefoil": 0.82
           },
           "touching": {
-            "flat": 0.86,
-            "trefoil": 1.0
+            "flat": 0.7,
+            "trefoil": 0.69
           }
         },
         "4": {
@@ -155,30 +155,30 @@
       "singleCore": {
         "2": {
           "0.15": {
-            "flat": 0.89,
-            "trefoil": 0.89
+            "flat": 0.85,
+            "trefoil": 0.82
           },
           "0.30": {
             "flat": 0.91,
-            "trefoil": 0.87
+            "trefoil": 0.88
           },
           "touching": {
-            "flat": 0.85,
-            "trefoil": 0.89
+            "flat": 0.8,
+            "trefoil": 0.77
           }
         },
         "3": {
           "0.15": {
-            "flat": 0.87,
-            "trefoil": 0.87
+            "flat": 0.76,
+            "trefoil": 0.73
           },
           "0.30": {
-            "flat": 0.89,
-            "trefoil": 0.84
+            "flat": 0.83,
+            "trefoil": 0.8
           },
           "touching": {
-            "flat": 0.81,
-            "trefoil": 0.87
+            "flat": 0.69,
+            "trefoil": 0.66
           }
         },
         "4": {
@@ -1249,14 +1249,14 @@
       }
     },
     "soilResistivity": {
-      "0.8": 0.8,
-      "0.9": 0.9,
+      "0.8": 1.1,
+      "0.9": 1.05,
       "1.0": 1.0,
-      "1.2": 1.2,
-      "1.5": 1.5,
-      "2.0": 2.0,
-      "2.5": 2.5,
-      "3.0": 3.0
+      "1.2": 0.92,
+      "1.5": 0.83,
+      "2.0": 0.73,
+      "2.5": 0.66,
+      "3.0": 0.6
     },
     "temperatureDerating": {
       "air": {

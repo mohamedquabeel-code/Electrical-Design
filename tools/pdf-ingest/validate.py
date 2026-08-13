@@ -126,7 +126,14 @@ def check_voltage_drop(products: list[dict], tables: dict) -> list[Finding]:
         if product.get("reducedNeutralCsa"):
             continue
         key = (family, product["conductor"], product["insulation"], product["csa"])
-        resistance.setdefault(key, product["rAcMax"])
+        # Recomputed from R_DC at the compound's rated temperature rather than
+        # read from the published R_AC column, which is on a 70 degC basis for
+        # XLPE below 16 mm2 despite its 90 degC heading. Testing the voltage
+        # drop tables against a mislabelled resistance would blame the wrong
+        # table: it is the resistance column that is wrong, not Table 18.
+        alpha = TEMPERATURE_COEFFICIENT[product["conductor"]]
+        rated = RATED_TEMPERATURE[product["insulation"]]
+        resistance.setdefault(key, product["rDc20"] * (1 + alpha * (rated - 20)))
 
     columns = {
         "pvcFlat": ("pvc", math.sqrt(3)),

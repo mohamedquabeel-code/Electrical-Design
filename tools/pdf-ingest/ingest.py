@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import cables  # noqa: E402
 import general  # noqa: E402
+import reactance as reactance_module  # noqa: E402
 from extract import Report, page_texts, sha256  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +56,8 @@ def main() -> int:
     rows = cables.parse(pages, report)
     tables = general.parse_all(pages, report)
     quarantined = apply_overrides(rows, report)
+    product_json = [row.to_json() for row in rows]
+    derived_reactance = reactance_module.derive(product_json, tables, report)
 
     duplicates = _duplicate_codes(rows)
     for code, count in duplicates.items():
@@ -65,12 +68,20 @@ def main() -> int:
         {
             "datasetId": DATASET_ID,
             "version": DATASET_VERSION,
-            "products": [row.to_json() for row in rows],
+            "products": product_json,
         },
     )
     write_json(
         OUTPUT_DIR / "general.json",
         {"datasetId": DATASET_ID, "version": DATASET_VERSION, "tables": tables},
+    )
+    write_json(
+        OUTPUT_DIR / "derived-reactance.json",
+        {
+            "datasetId": DATASET_ID,
+            "version": DATASET_VERSION,
+            "reactance": derived_reactance,
+        },
     )
     write_json(
         OUTPUT_DIR / "provenance.json",
@@ -114,6 +125,7 @@ def main() -> int:
 
     print(f"  products     {len(rows)}")
     print(f"  quarantined  {len(quarantined)} defective published value(s)")
+    print(f"  reactance    derived for {_count_reactance(derived_reactance)} size(s)")
     print(f"  general      {len(tables)} table groups: {', '.join(sorted(tables))}")
     print(f"  written to   {OUTPUT_DIR.relative_to(REPO_ROOT)}")
 
@@ -181,6 +193,15 @@ def apply_overrides(rows: list[cables.CableRow], report: Report) -> list[dict]:
         applied.append(entry)
 
     return applied
+
+
+def _count_reactance(derived: dict) -> int:
+    total = 0
+    for family in ("singleCore", "multiCore"):
+        for insulations in derived.get(family, {}).values():
+            for sizes in insulations.values():
+                total += len(sizes)
+    return total
 
 
 def _duplicate_codes(rows: list[cables.CableRow]) -> dict[str, int]:
