@@ -105,26 +105,18 @@ Public Sub BuildFrmFaultList()
     CreateControl frm.Name, acTextBox, acDetail, , "Status", 4050, 60, 1200, 250
     CreateControl frm.Name, acTextBox, acDetail, , "Description", 5300, 60, 3500, 250
 
-    frm.Section(acHeader).Visible = True
-    frm.Section(acHeader).Height = 350
-    AddHeaderLabel frm.Name, "Ferry", 100
-    AddHeaderLabel frm.Name, "Date", 1750
-    AddHeaderLabel frm.Name, "Severity", 3000
-    AddHeaderLabel frm.Name, "Status", 4050
-    AddHeaderLabel frm.Name, "Description", 5300
+    ' Column header labels aren't built here - toggling a Form Header band's
+    ' Visible property via automation isn't reliable across Access versions.
+    ' Add them in ~30 seconds instead: open this form in Design view,
+    ' right-click the form selector > Form Header/Footer, then type these
+    ' captions above their matching column: Ferry | Date | Severity |
+    ' Status | Description.
 
     Dim tempName As String
     tempName = frm.Name
     DoCmd.Close acForm, tempName, acSaveYes
     DoCmd.Rename "frmFaultList", acForm, tempName
 
-End Sub
-
-Private Sub AddHeaderLabel(frmName As String, caption As String, leftPos As Long)
-    Dim lbl As Access.Control
-    Set lbl = CreateControl(frmName, acLabel, acHeader, , , leftPos, 60, 1500, 250)
-    lbl.Caption = caption
-    lbl.FontBold = True
 End Sub
 
 ' ------------------------------------------------------------------- PM Items
