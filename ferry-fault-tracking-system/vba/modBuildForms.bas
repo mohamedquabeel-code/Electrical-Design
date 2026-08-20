@@ -51,8 +51,12 @@ Public Sub BuildFrmFaultEntry()
     ctl.Caption = "Close"
     ctl.OnClick = "=CloseForm()"
 
-    DoCmd.Close acForm, frm.Name, acSaveYes
-    DoCmd.Rename "frmFaultEntry", acForm, frm.Name
+    ' Capture the name before closing - frm becomes invalid the instant the
+    ' form closes, so frm.Name can no longer be read after DoCmd.Close.
+    Dim tempName As String
+    tempName = frm.Name
+    DoCmd.Close acForm, tempName, acSaveYes
+    DoCmd.Rename "frmFaultEntry", acForm, tempName
 
 End Sub
 
@@ -109,8 +113,10 @@ Public Sub BuildFrmFaultList()
     AddHeaderLabel frm.Name, "Status", 4050
     AddHeaderLabel frm.Name, "Description", 5300
 
-    DoCmd.Close acForm, frm.Name, acSaveYes
-    DoCmd.Rename "frmFaultList", acForm, frm.Name
+    Dim tempName As String
+    tempName = frm.Name
+    DoCmd.Close acForm, tempName, acSaveYes
+    DoCmd.Rename "frmFaultList", acForm, tempName
 
 End Sub
 
@@ -145,8 +151,10 @@ Public Sub BuildFrmPMItems()
     ctl.Caption = "Close"
     ctl.OnClick = "=CloseForm()"
 
-    DoCmd.Close acForm, frm.Name, acSaveYes
-    DoCmd.Rename "frmPMItems", acForm, frm.Name
+    Dim tempName As String
+    tempName = frm.Name
+    DoCmd.Close acForm, tempName, acSaveYes
+    DoCmd.Rename "frmPMItems", acForm, tempName
 
 End Sub
 
@@ -167,8 +175,10 @@ Public Sub BuildFrmSwitchboard()
     AddSwitchboardButton frm.Name, "cmdViewFaults", "View Faults", 1250, "frmFaultList"
     AddSwitchboardButton frm.Name, "cmdPMItems", "Next PM List", 1700, "frmPMItems"
 
-    DoCmd.Close acForm, frm.Name, acSaveYes
-    DoCmd.Rename "frmSwitchboard", acForm, frm.Name
+    Dim tempName As String
+    tempName = frm.Name
+    DoCmd.Close acForm, tempName, acSaveYes
+    DoCmd.Rename "frmSwitchboard", acForm, tempName
 
 End Sub
 
