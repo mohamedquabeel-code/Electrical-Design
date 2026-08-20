@@ -56,62 +56,99 @@ visit).
 
 Reference DDL is in [`schema/tables.sql`](schema/tables.sql) — paste it into
 an Access query in SQL View to create all tables in one shot, or use it as a
-checklist while building tables in the Table Designer.
+checklist while building tables in the Table Designer. [`vba/modBuildBackend.bas`](vba/modBuildBackend.bas)
+does the same thing as one runnable macro instead (see [File names & how the
+files get built](#file-names--how-the-files-get-built) below).
 
 ## Forms
 
-Build these as bound forms in the frontend:
+`vba/modBuildForms.bas` builds these four automatically (see the build kit
+steps below) — no manual form design required:
 
 - **frmSwitchboard** — landing screen with buttons: "Log a Fault", "View
-  Open Faults", "Next PM List", "Reports". Auto-detect the user with
-  `Environ("USERNAME")` so `ReportedBy`/`AddedBy` fill in without typing.
-- **frmFaultEntry** — single-record form bound to `tblFaults`. Combo boxes
-  for Ferry / Equipment System / Severity / Status. A "Send to next PM"
-  checkbox/button that inserts a linked row into `tblPMItems` with
-  `SourceFaultID` set, so nothing has to be typed twice.
-- **frmFaultList** — continuous form / datasheet of `tblFaults` with filter
-  controls (by ferry, date range, status) for quickly checking what's open.
+  Faults", "Next PM List".
+- **frmFaultEntry** — single-record form bound to `tblFaults`. Lookup combos
+  for Ferry / Equipment System, value-list combos for Severity / Status, a
+  "Reported By" box that defaults to the logged-in Windows user, and a
+  "Send to Next PM" button that inserts a linked row into `tblPMItems`
+  (`SourceFaultID` set) so nothing has to be typed twice.
+- **frmFaultList** — continuous form over `tblFaults` (joined to the ferry
+  name) for quickly scanning what's open, newest first.
 - **frmPMItems** — bound to `tblPMItems`; the working list for "what gets
   handled next PM." Filter by Status = Pending to get the actual worklist.
-- **frmPMChecklist** — read-mostly view used *during* the PM to tick items
-  off (updates Status/DateCompleted/CompletedBy).
-- **rptFaultLog / rptPMWorklist** — printable reports for handing to the crew
-  or filing.
 
-## Setup steps
+Not auto-built, add these yourself in Design view once you're happy with
+the generated forms (both are a few minutes with Access's built-in
+wizards, and easier to get looking right interactively than to generate):
 
-1. **Build once, on one PC.** Create a normal `.accdb`, build the tables
-   (see schema below), relationships, and forms.
-2. **Split it.** Database Tools → Access Database Splitter → point the
-   backend at `\\SERVER\FerryData\Ferry_Backend.accdb`. This is a standard
-   user-level wizard.
-3. **Distribute the frontend.** Copy `Ferry_Frontend.accdb` to each PC
-   (Desktop or Documents — anywhere the user can already write). Copying a
-   file needs no admin rights.
-4. **Make a desktop shortcut** to each user's local frontend copy for easy
-   daily use.
-5. **Set multi-user options** in the frontend (Access Options → Client
+- **frmPMChecklist** — a read-mostly view used *during* the PM to tick
+  items off (updates Status/DateCompleted/CompletedBy).
+- **rptFaultLog / rptPMWorklist** — printable reports for handing to the
+  crew or filing, via the Report Wizard against `tblFaults` / `tblPMItems`.
+
+## File names & how the files get built
+
+Access keeps tables, forms, queries and reports **inside** the `.accdb`
+file — there's no separate "table file" or "form file" to hand you. What
+you end up with is exactly two files:
+
+| File | Contains | Lives where |
+|---|---|---|
+| `Ferry_Backend.accdb` | tables only | the network share |
+| `Ferry_Frontend.accdb` | forms, queries, reports + linked tables | copied onto each user's own PC |
+
+I can't run Access from here to produce those binary files directly, so
+instead this folder gives you a **one-click build kit**: two VBA modules
+that create every table and every form for you the first time you run
+them, in a temporary unsplit database. You only do this once.
+
+1. **Create a blank working database.** File → New → Blank database → name
+   it `Ferry_Tracking.accdb` (this is a temporary name — after splitting it
+   becomes the two files above).
+2. **Import the build code.** Alt+F11 to open the VBA editor → Insert →
+   Module, then paste in the contents of
+   [`vba/modBuildBackend.bas`](vba/modBuildBackend.bas). Insert a second
+   module and paste in [`vba/modBuildForms.bas`](vba/modBuildForms.bas).
+3. **Run the builders.** Press Ctrl+G to open the Immediate window, type
+   `BuildBackendTables` and press Enter, then type `BuildAllForms` and
+   press Enter. This creates all 6 tables (with relationships) and all 4
+   forms (`frmSwitchboard`, `frmFaultEntry`, `frmFaultList`, `frmPMItems`),
+   including the "Send to Next PM" button that copies a fault straight into
+   the PM worklist.
+4. **Look it over.** Open `frmSwitchboard` and click through — resize or
+   restyle anything in Design view, it's a completely normal form at this
+   point.
+5. **Split it.** Database Tools → Access Database Splitter (a standard
+   user-level wizard, no admin rights needed) → save the backend as
+   `Ferry_Backend.accdb` on your shared network folder, e.g.
+   `\\SERVER\FerryData\Ferry_Backend.accdb`. Access automatically renames
+   what's left on your PC to `Ferry_Frontend.accdb` and relinks its tables
+   to the new backend.
+6. **Distribute the frontend.** Copy `Ferry_Frontend.accdb` to each other
+   PC (Desktop or Documents — anywhere the user can already write; copying
+   a file needs no admin rights) and make a desktop shortcut to it.
+7. **Set multi-user options** in the frontend (Access Options → Client
    Settings → Advanced): Default open mode = *Shared*, Default record
    locking = *Edited record*. This lets several people enter faults for
    different ferries at the same time without locking each other out.
-6. **Auto-relink on open.** PCs may see the share under different drive
-   letters, or you may move the backend later. Add the relink code in
+8. **Auto-relink on open.** PCs may see the share under a different drive
+   letter, or you may move the backend later. Add the relink code in
    [`vba/modRelink.bas`](vba/modRelink.bas) to an `AutoExec` macro or the
-   frontend's startup form `Open` event — it re-points linked tables at a
-   UNC path automatically, no DSN, no admin rights needed.
-7. **Backups.** Since you likely can't rely on IT to schedule a backup job,
+   `frmSwitchboard` form's `Open` event — it re-points linked tables at a
+   UNC path automatically, no DSN, no admin rights needed. (Update the
+   `BACKEND_PATH` constant at the top of that module to match your share.)
+9. **Backups.** Since you likely can't rely on IT to schedule a backup job,
    use [`vba/modBackup.bas`](vba/modBackup.bas): a "Backup Now" button (and
    optionally an on-close check that only backs up once/day) that copies
    the backend `.accdb` to a dated file in a `\Backups` subfolder on the
    same share. Best run when the backend isn't mid-write; a manual button
    pressed at end of shift is the simplest reliable option without admin
    rights or Task Scheduler access.
-8. **Roll out frontend updates.** When you change forms later, keep a
-   `tblVersion` row in the backend with the current frontend version
-   number, and have the frontend compare its own hard-coded version on
-   startup; if it doesn't match, show "A newer version is available at
-   \\SERVER\FerryData\Ferry_Frontend_latest.accdb — please copy it to your
-   PC." Simple and needs no deployment tooling.
+10. **Roll out frontend updates.** When you change forms later, bump the
+    `tblVersion` row in the backend and have the frontend compare its own
+    hard-coded version on startup; if it doesn't match, show "A newer
+    version is available at \\SERVER\FerryData\Ferry_Frontend_latest.accdb
+    — please copy it to your PC." Simple and needs no deployment tooling.
 
 ## Multi-user notes / limits to know about
 
