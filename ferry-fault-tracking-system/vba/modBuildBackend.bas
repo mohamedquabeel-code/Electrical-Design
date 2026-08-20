@@ -36,6 +36,10 @@ Public Sub BuildBackendTables()
         "SystemName TEXT(75) NOT NULL, " & _
         "Notes MEMO)"
 
+    ' Note: Access SQL (Jet/ACE) does NOT support an inline DEFAULT clause in
+    ' CREATE TABLE - that's T-SQL/MySQL syntax. Default values are set below,
+    ' after the table exists, via each field's DefaultValue property instead.
+
     RunDDL db, "CREATE TABLE tblFaults (" & _
         "FaultID AUTOINCREMENT PRIMARY KEY, " & _
         "FerryID LONG NOT NULL REFERENCES tblFerries (FerryID), " & _
@@ -45,17 +49,17 @@ Public Sub BuildBackendTables()
         "ReportedBy TEXT(50) NOT NULL, " & _
         "Description MEMO NOT NULL, " & _
         "Severity TEXT(20) NOT NULL, " & _
-        "Status TEXT(20) NOT NULL DEFAULT 'Open', " & _
+        "Status TEXT(20) NOT NULL, " & _
         "DateResolved DATETIME, " & _
         "ResolutionNotes MEMO, " & _
-        "SendToNextPM YESNO NOT NULL DEFAULT 0)"
+        "SendToNextPM YESNO NOT NULL)"
 
     RunDDL db, "CREATE TABLE tblPMEvents (" & _
         "PMEventID AUTOINCREMENT PRIMARY KEY, " & _
         "FerryID LONG NOT NULL REFERENCES tblFerries (FerryID), " & _
         "PMDate DATETIME NOT NULL, " & _
         "PMType TEXT(30), " & _
-        "Status TEXT(20) NOT NULL DEFAULT 'Scheduled')"
+        "Status TEXT(20) NOT NULL)"
 
     RunDDL db, "CREATE TABLE tblPMItems (" & _
         "PMItemID AUTOINCREMENT PRIMARY KEY, " & _
@@ -65,9 +69,9 @@ Public Sub BuildBackendTables()
         "DateAdded DATETIME NOT NULL, " & _
         "AddedBy TEXT(50) NOT NULL, " & _
         "ItemDescription MEMO NOT NULL, " & _
-        "Priority TEXT(20) NOT NULL DEFAULT 'Normal', " & _
+        "Priority TEXT(20) NOT NULL, " & _
         "TargetPMDate DATETIME, " & _
-        "Status TEXT(20) NOT NULL DEFAULT 'Pending', " & _
+        "Status TEXT(20) NOT NULL, " & _
         "DateCompleted DATETIME, " & _
         "CompletedBy TEXT(50), " & _
         "Notes MEMO)"
@@ -77,8 +81,22 @@ Public Sub BuildBackendTables()
         "CurrentVersion TEXT(20) NOT NULL, " & _
         "UpdatedOn DATETIME)"
 
-    db.Execute "INSERT INTO tblFerries (FerryName) VALUES ('Ferry X')", dbFailOnError
-    db.Execute "INSERT INTO tblVersion (CurrentVersion, UpdatedOn) VALUES ('1.0', Now())", dbFailOnError
+    ' TableDefs was cached before the CREATE TABLE calls above - get a fresh
+    ' reference so the newly created tables/fields are visible to DAO.
+    Set db = CurrentDb()
+    SetDefault db, "tblFaults", "Status", "'Open'"
+    SetDefault db, "tblFaults", "SendToNextPM", "0"
+    SetDefault db, "tblPMEvents", "Status", "'Scheduled'"
+    SetDefault db, "tblPMItems", "Priority", "'Normal'"
+    SetDefault db, "tblPMItems", "Status", "'Pending'"
+
+    ' Safe to run more than once - only seeds data the first time.
+    If DCount("*", "tblFerries") = 0 Then
+        db.Execute "INSERT INTO tblFerries (FerryName) VALUES ('Ferry X')", dbFailOnError
+    End If
+    If DCount("*", "tblVersion") = 0 Then
+        db.Execute "INSERT INTO tblVersion (CurrentVersion, UpdatedOn) VALUES ('1.0', Now())", dbFailOnError
+    End If
 
     MsgBox "Backend tables created.", vbInformation, "Ferry Tracking - Build Backend"
 
@@ -93,4 +111,15 @@ AlreadyExists:
     If InStr(Err.Description, "already exists") = 0 Then
         MsgBox "Error creating table:" & vbCrLf & sql & vbCrLf & vbCrLf & Err.Description, vbCritical
     End If
+End Sub
+
+' expr is a Default Value expression, e.g. "'Open'" for a text literal or
+' "0" for a number - matches what you'd type into the Default Value box in
+' the Table Designer's field properties.
+Private Sub SetDefault(db As DAO.Database, tableName As String, fieldName As String, expr As String)
+    On Error GoTo Failed
+    db.TableDefs(tableName).Fields(fieldName).DefaultValue = expr
+    Exit Sub
+Failed:
+    MsgBox "Could not set default for " & tableName & "." & fieldName & ": " & Err.Description, vbExclamation
 End Sub
